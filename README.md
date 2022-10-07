@@ -1,7 +1,7 @@
 # ic-08
 ic-08 - Intro to D3 Part 2
 
-Link to GitHub Pages: `[insert your clickable hyperlink here]`
+Link to GitHub Pages: https://ds4200-sec2-f22.github.io/ic-08-v2-ngk5/
 
 ## Purpose
 
