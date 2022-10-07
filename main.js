@@ -1,6 +1,6 @@
 // div size (frame)
 const FRAME_HEIGHT = 500;
-const FRAME_WIDTH = 500;
+const FRAME_WIDTH = 700;
 const MARGINS = {left: 100, right: 50, top: 50, bottom: 50};
 
 const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
@@ -15,27 +15,40 @@ const FRAME = d3.select("#vis")
 d3.csv("data/data.csv").then((data) => {
 
 	// scaling
-	const MAX_VALUE = d3.max(data, (d) => {return parseInt(d.Value);})
+	const MAX_VALUE_Y = d3.max(data, (d) => {return parseInt(d.Value);})
 
-	const SCALE = d3.scaleLinear()
-						.domain([0, MAX_VALUE + 10000])
-						.range([0, VIS_WIDTH]);
+	const X_SCALE = d3.scaleBand()
+						// map categories to be equally spaced on x-axis
+						.domain(data.map((d) => {return d.Category;}))
+						.range([0, VIS_WIDTH])
+						.padding(0.4);
 
-	// add axis
+	const Y_SCALE = d3.scaleLinear()
+						.domain([0, MAX_VALUE_Y + 10000])
+						.range([VIS_HEIGHT, 0]);
+
+	// add y-axis
 	FRAME.append("g")
 			.attr("transform", "translate(" + MARGINS.left + "," + MARGINS.top + ")")
-			.call(d3.axisLeft(SCALE).ticks(4))
+			.call(d3.axisLeft(Y_SCALE).ticks(4))
 				.attr("font-size", "20px");
+
+	//add x-axis
+	FRAME.append("g")
+			.attr("transform", "translate(" + MARGINS.left + "," + (VIS_HEIGHT + MARGINS.top) + ")")
+			.call(d3.axisBottom(X_SCALE).ticks(4))
+				.attr("font-size", "20px")
 
 	// add bars for data
 	FRAME.selectAll("bars")
 			.data(data)
 			.enter()
 			.append("rect")
-				.attr("x", MARGINS.left)
-				.attr("y", (VIS_HEIGHT + MARGINS.top))
-				.attr("height", (d) => {SCALE(d.Value);})
-				.attr("width", 50)
-				.attr("fill", "lightblue")
+				.attr("x", (d) => {return (MARGINS.left + X_SCALE(d.Category));})
+				.attr("y", (d) => {return (MARGINS.top + Y_SCALE(d.Value));})
+				.attr("width", X_SCALE.bandwidth())
+				.attr("height", (d) => {return (VIS_HEIGHT - Y_SCALE(d.Value));})
+				.attr("fill", "dodgerblue")
 				.attr("class", "bar");
+
 })
